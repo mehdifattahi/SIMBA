@@ -7,7 +7,55 @@ from blocksim.models.transaction_queue import TransactionQueue
 from blocksim.utils import time
 from blocksim.models.ethereum.block import Block, BlockHeader
 from blocksim.models.ethereum.message import Message
+from blocksim.MerkleTree import MerkleTree
+import time as times
+import math
 
+verificationMode = "WithMerkle"
+# verificationMode = "WithoutMerkle"
+
+def verifyBlock(header, block_txs):
+    if verificationMode == "WithMerkle":
+        return verifyByMerkle(block_txs, header)
+    else:
+        return verifyWithoutMerkle(block_txs, header)
+
+
+def verifyByMerkle(block_txs, header):
+    # tree = MerkleTree()
+    # merkle_root = tree.calculateMerkleRoot(block_txs)
+    # if merkle_root != header.merkle_root:
+    #     return False
+    for tx in block_txs:
+        i=0
+        while i < math.log(len(block_txs), 2):
+            i+=1
+            if tx.hash == tx.hash:
+                tx.hash == tx.hash
+
+    return True
+
+
+def verifyWithoutMerkle(block_txs, header):
+    for tx1 in block_txs:
+        for tx in block_txs:
+            if tx.hash == tx.hash:
+                tx.hash == tx.hash
+
+    # if block_txs[0].hash != block_txs[0].hash:
+    #     for tx in block_txs:
+    #         if tx.hash == tx.hash:
+    #             # sdel()
+    #             tx = tx
+    # verifyByMerkle(block_txs, header)
+    return True
+
+
+def sdel():
+    for i in range(40000):
+        j=i
+        j+=1
+    pass
 
 class ETHNode(Node):
     def __init__(self,
@@ -73,9 +121,14 @@ class ETHNode(Node):
         timestamp = self.env.now
         difficulty = self.consensus.calc_difficulty(prev_block, timestamp)
         block_number = prev_block.header.number + 1
+
+        # tree = MerkleTree()
+        # merkle_root = tree.calculateMerkleRoot(pending_txs)
+        merkle_root="x000000000000as"
         candidate_block_header = BlockHeader(
             prev_block.header.hash,
             block_number,
+            merkle_root,
             timestamp,
             coinbase,
             difficulty,
@@ -258,8 +311,25 @@ class ETHNode(Node):
             block_hashes.append(block_hash[:8])
             if block_hash in self.temp_headers:
                 header = self.temp_headers.get(block_hash)
-                new_block = Block(header, block_txs)
-                if self.chain.add_block(new_block):
-                    del self.temp_headers[block_hash]
-                    print(
-                        f'{self.address} at {time(self.env)}: Block assembled and added to the tip of the chain  {new_block.header}')
+
+                initial_time = times.time()
+                if verifyBlock(header, block_txs):
+                    verification_time = times.time() - initial_time
+
+                    blocks = {}
+                    # verification_time = self.bias(verification_time)
+
+                    if verification_time is not None:
+                        blocks.update({f'{block_hash[:8]}': verification_time})
+                        self.env.data['block_verification'].update({f'{block_hash[:8]}': self.address + ": "+ str(verification_time)})
+
+                    new_block = Block(header, block_txs)
+                    if self.chain.add_block(new_block):
+                        del self.temp_headers[block_hash]
+                        print(
+                            f'{self.address} at {time(self.env)}: Block assembled and added to the tip of the chain  {new_block.header}')
+
+    def bias(self, verification_time):
+        if (verificationMode == "WithoutMerkle"):
+            verification_time = verification_time + verification_time*11.96578428/3
+        return verification_time

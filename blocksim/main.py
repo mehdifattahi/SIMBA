@@ -1,14 +1,19 @@
 import time
 from json import dumps as dump_json
-from world import SimulationWorld
-from node_factory import NodeFactory
-from transaction_factory import TransactionFactory
+from blocksim.world import SimulationWorld
+from blocksim.node_factory import NodeFactory
+from blocksim.transaction_factory import TransactionFactory
 from blocksim.models.network import Network
 
 
 def write_report(world):
-    with open('output/report.json', 'w') as f:
+    with open('report.json', 'w') as f:
         f.write(dump_json(world.env.data))
+    with open('report-pt.json', 'w') as f:
+        f.write(dump_json(world.env.data['block_propagation']))
+    with open('report-vf.json', 'w') as f1:
+        f1.write(str(world.report_verification_time()))
+
 
 
 def report_node_chain(world, nodes_list):
@@ -31,16 +36,16 @@ def report_node_chain(world, nodes_list):
 
 def run_model():
     now = int(time.time())  # Current time
-    duration = 3600  # seconds
+    duration = 36000  # seconds
 
     world = SimulationWorld(
         duration,
         now,
-        'input-parameters/config.json',
-        'input-parameters/latency.json',
-        'input-parameters/throughput-received.json',
-        'input-parameters/throughput-sent.json',
-        'input-parameters/delays.json')
+        '../input-parameters/config.json',
+        '../input-parameters/latency.json',
+        '../input-parameters/throughput-received.json',
+        '../input-parameters/throughput-sent.json',
+        '../input-parameters/delays.json')
 
     # Create the network
     network = Network(world.env, 'NetworkXPTO')
@@ -53,11 +58,18 @@ def run_model():
         'Tokyo': {
             'how_many': 2,
             'mega_hashrate_range': "(20, 40)"
+        },
+        'Canada': {
+            'how_many': 8,
+            'mega_hashrate_range': "(20, 40)"
         }
     }
     non_miners = {
         'Tokyo': {
             'how_many': 1
+        },
+        'Canada': {
+            'how_many': 10
         },
         'Ireland': {
             'how_many': 1

@@ -1,6 +1,6 @@
 {
   "blockchain": "ethereum",
-  "locations": ["Tokyo", "Ohio", "Ireland"],
+  "locations": ["Tokyo", "Ohio", "Ireland", "Canada"],
   "bitcoin": {
     "block_size_limit_mb": 1,
     "number_transactions_per_block": {

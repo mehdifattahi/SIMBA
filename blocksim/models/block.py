@@ -19,12 +19,14 @@ class BlockHeader:
     def __init__(self,
                  prevhash=encode_hex(b'\x00' * 32),
                  number=0,
+                 merkle_root=encode_hex(b'\x00' * 32),
                  timestamp=int(time.time()),
                  coinbase=encode_hex(b'\x00' * 20),
                  difficulty=100000,
                  nonce=''):
         self.prevhash = prevhash
         self.number = number
+        self.merkle_root = merkle_root
         self.timestamp = timestamp
         self.coinbase = coinbase
         self.difficulty = difficulty

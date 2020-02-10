@@ -1,7 +1,7 @@
 from blocksim.utils import encode_hex
 from blocksim.models.block import BlockHeader as BaseBlockHeader
 from blocksim.models.block import Block as BaseBlock
-
+from datetime import datetime
 
 class BlockHeader(BaseBlockHeader):
     """ Defines the BlockHeader model for the Ethereum.
@@ -21,15 +21,25 @@ class BlockHeader(BaseBlockHeader):
     def __init__(self,
                  prevhash=encode_hex(b'\x00' * 32),
                  number=0,
+                 merkle_root=0,
                  timestamp=0,
                  coinbase=encode_hex(b'\x00' * 20),
                  difficulty=100000,
                  gas_limit=3000000,
                  gas_used=0,
                  nonce=''):
-        super().__init__(prevhash, number, timestamp, coinbase, difficulty, nonce)
+        super().__init__(prevhash, number, merkle_root, timestamp, coinbase, difficulty, nonce)
         self.gas_limit = gas_limit
         self.gas_used = gas_used
+
+    def __str__(self):
+        """Returns a readable representation of the block"""
+        timestamp = datetime.utcfromtimestamp(
+            self.timestamp).strftime('%m-%d %H:%M:%S')
+        if(self.merkle_root==0):
+            return f'<{self.__class__.__name__}(#{self.number} merkle_root:00000000 prevhash:{self.prevhash[:8]} timestamp:{timestamp} coinbase:{self.coinbase} difficulty:{self.difficulty})>'
+        else:
+            return f'<{self.__class__.__name__}(#{self.number} merkle_root:{self.merkle_root[:8]} prevhash:{self.prevhash[:8]} timestamp:{timestamp} coinbase:{self.coinbase} difficulty:{self.difficulty})>'
 
 
 class Block(BaseBlock):

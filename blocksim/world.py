@@ -55,7 +55,8 @@ class SimulationWorld:
             'end_simulation_time': datetime.utcfromtimestamp(end_simulation).strftime('%m-%d %H:%M:%S'),
             'created_transactions': 0,
             'tx_propagation': {},
-            'block_propagation': {}
+            'block_propagation': {},
+            'block_verification': {}
         }
 
     @property
@@ -141,3 +142,7 @@ class SimulationWorld:
     def _read_json_file(self, file_location):
         with open(file_location) as f:
             return json.load(f)
+
+    def report_verification_time(self):
+        return self.env.data['block_verification'].values()
+

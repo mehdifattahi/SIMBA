@@ -58,6 +58,8 @@ class Node:
                 # Set the bases to monitor the block & TX propagation
                 self.env.data['block_propagation'].update({
                     f'{self.address}_{node.address}': {}})
+                # self.env.data['block_verification'].update({
+                #     f'{self.address}_{node.address}': {}})
                 self.env.data['tx_propagation'].update({
                     f'{self.address}_{node.address}': {}})
 
