@@ -1,4 +1,3 @@
-==============================
 SIMBA: An Efficient Simulator for Blockchain Applications
 ==============================
 
@@ -7,5 +6,5 @@ SIMBA is built on top of BlockSim (a framework for modeling and simulating a Blo
 Simulation results
 ======
 
-You can find more information on the study that we carried out ["here"](https://docs.google.com/spreadsheets/d/1XL2-UALnJVKZfALbkNZkpuciBYoyD4ZAxq1csKob3-Q/edit?usp=sharing).
+You can find more information on the study that we carried out [here](https://docs.google.com/spreadsheets/d/1XL2-UALnJVKZfALbkNZkpuciBYoyD4ZAxq1csKob3-Q/edit?usp=sharing).
 
