@@ -7,7 +7,7 @@ SIMBA is built on top of BlockSim (a framework for modeling and simulating a Blo
 Clarification
 ======
 
-Pleasse note that our simulator has no connection with the company SIMBA Chain Inc. that focus on creating blockchain distributed applications, where SIMBA (Simple Blockchain Applications) is a platform to deploy a blockchain network.
+Pleasse note that our simulator has no connection with the company SIMBA Chain Inc. that focuses on creating blockchain applications, where SIMBA (Simple Blockchain Applications) is a platform to deploy a blockchain network.
 
 
 Simulation results
