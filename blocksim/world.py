@@ -27,6 +27,7 @@ class SimulationWorld:
     """
 
     def __init__(self,
+                 verification_mode: str,
                  sim_duration: int,
                  initial_time: int,
                  config_file: str,
@@ -34,6 +35,7 @@ class SimulationWorld:
                  measured_throughput_received: str,
                  measured_throughput_sent: str,
                  measured_delays: str):
+        self.verification_mode = verification_mode
         self._measured_delays = self._read_json_file(measured_delays)
         self._sim_duration = sim_duration
         self._initial_time = initial_time
