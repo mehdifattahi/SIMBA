@@ -19,7 +19,7 @@
   },
   "ethereum": {
     "block_gas_limit": 2100000,
-    "tx_gas_limit": 21000,
+    "tx_gas_limit": 10500,
     "orphan_blocks_probability": 0.0174,
     "message_size_kB": {
       "status": 0.2,
