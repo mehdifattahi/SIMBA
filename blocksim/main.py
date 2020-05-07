@@ -1,19 +1,51 @@
 import time
+import csv
 from json import dumps as dump_json
 from blocksim.world import SimulationWorld
 from blocksim.node_factory import NodeFactory
 from blocksim.transaction_factory import TransactionFactory
 from blocksim.models.network import Network
 
-
 def write_report(world):
-    with open('report.json', 'w') as f:
+    report_directory = 'report/'
+    with open(report_directory + 'report.json', 'w') as f:
         f.write(dump_json(world.env.data))
-    with open('report-pt.json', 'w') as f:
-        f.write(dump_json(world.env.data['block_propagation']))
-    with open('report-vf.json', 'w') as f1:
-        f1.write(str(world.report_verification_time()))
+    with open(report_directory + 'propagation-time.csv', 'w') as f:
+        f.write('connection, count, sum, average\n')
+        for connection in world.env.data['block_propagation']:
+            propagation_values = world.env.data['block_propagation'][connection]
+            if len(propagation_values) > 0:
+                sum = 0
+                for i in propagation_values:
+                    sum = + propagation_values[i]
+                avg = sum / len(propagation_values)
+                f.write(connection + ', ' + str(len(propagation_values)) + ', ' + str(sum) + ', ' + str(avg) + '\n')
+        # f.write(dump_json(world.env.data['block_propagation']))
 
+    with open(report_directory + 'verification-time.csv', 'w') as f:
+        f.write(dump_json(world.env.data['block_verification']))
+
+    vf_node = {}
+    with open(report_directory + 'block-verification-time.csv', 'w') as f:
+        # f.write(str(world.report_verification_time()))
+        writer = csv.writer(f)
+        for block_vf in world.report_verification_time():
+            split = block_vf.split(':')
+            writer.writerow([split[1]])
+            if split[0] in vf_node:
+                value = vf_node[split[0]]
+                split_value = value.split(',')
+                split_value[0] = str(int(split_value[0]) + 1)
+                split_value[1] = str(float(split[1]) + float(split_value[1]))
+                split_value[2] = str(float(split_value[1]) / float(split_value[0]))
+                vf_node[split[0]] = split_value[0] + ', ' + split_value[1] + ', ' + split_value[2]
+            else:
+                vf_node[split[0]] = '1, ' + split[1] + ', ' + split[1]
+    with open(report_directory + 'node-verification-time-average.csv', 'w') as f:
+        f.write('node, count, sum, average\n')
+        for block_vf in vf_node:
+            f.write(block_vf + ', ' + vf_node[block_vf] + '\n')
+            # writer.writerow([block_vf + ', ' + vf_node[block_vf]])
 
 
 def report_node_chain(world, nodes_list):
@@ -36,9 +68,12 @@ def report_node_chain(world, nodes_list):
 
 def run_model():
     now = int(time.time())  # Current time
-    duration = 360000  # seconds
+    duration = 400  # seconds
+    verification_mode = "WithMerkle"
+    # verification_mode = "WithoutMerkle"
 
     world = SimulationWorld(
+        verification_mode,
         duration,
         now,
         '../input-parameters/config.json',
@@ -51,11 +86,11 @@ def run_model():
     network = Network(world.env, 'NetworkXPTO')
 
     miners = {
-        'Ohio': {
-            'how_many': 0,
+        'USA': {
+            'how_many': 4,
             'mega_hashrate_range': "(20, 40)"
         },
-        'Tokyo': {
+        'Japan': {
             'how_many': 2,
             'mega_hashrate_range': "(20, 40)"
         },
@@ -65,7 +100,7 @@ def run_model():
         }
     }
     non_miners = {
-        'Tokyo': {
+        'Japan': {
             'how_many': 1
         },
         'Canada': {
@@ -83,10 +118,12 @@ def run_model():
     world.env.process(network.start_heartbeat())
     # Full Connect all nodes
     for node in nodes_list:
+        node.verification_mode = verification_mode
         node.connect(nodes_list)
 
     transaction_factory = TransactionFactory(world)
-    transaction_factory.broadcast(100, 400, 15, nodes_list)
+    transaction_factory.broadcast(100, 40, 15, nodes_list)
+    # transaction_factory.broadcast(5000, 4000, 15, nodes_list)
 
     world.start_simulation()
 

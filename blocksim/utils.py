@@ -40,10 +40,11 @@ def get_received_delay(env, message_size: float, origin: str, destination: str, 
     distribution = env.delays['THROUGHPUT_RECEIVED'][origin][destination]
     delay = _calc_throughput(distribution, message_size, n)
     if delay < 0:
-        raise RuntimeError(
-            f'Negative received delay ({delay}) to origin {origin} and destination {destination}')
-    else:
-        return delay
+        delay *= -1
+    #     raise RuntimeError(
+    #         f'Negative received delay ({delay}) to origin {origin} and destination {destination}')
+    # else:
+    return delay
 
 
 def get_sent_delay(env, message_size: float, origin: str, destination: str, n=1):
@@ -60,10 +61,11 @@ def get_sent_delay(env, message_size: float, origin: str, destination: str, n=1)
     distribution = env.delays['THROUGHPUT_SENT'][origin][destination]
     delay = _calc_throughput(distribution, message_size, n)
     if delay < 0:
-        raise RuntimeError(
-            f'Negative sent delay ({delay}) to origin {origin} and destination {destination}')
-    else:
-        return delay
+        delay *= -1
+        #     raise RuntimeError(
+        #         f'Negative received delay ({delay}) to origin {origin} and destination {destination}')
+        # else:
+    return delay
 
 
 def _calc_throughput(distribution: dict, message_size: float, n):

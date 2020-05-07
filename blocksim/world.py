@@ -27,6 +27,7 @@ class SimulationWorld:
     """
 
     def __init__(self,
+                 verification_mode: str,
                  sim_duration: int,
                  initial_time: int,
                  config_file: str,
@@ -34,6 +35,7 @@ class SimulationWorld:
                  measured_throughput_received: str,
                  measured_throughput_sent: str,
                  measured_delays: str):
+        self.verification_mode = verification_mode
         self._measured_delays = self._read_json_file(measured_delays)
         self._sim_duration = sim_duration
         self._initial_time = initial_time
@@ -93,14 +95,17 @@ class SimulationWorld:
         self._validate_distribution(
             self._measured_delays['bitcoin']['tx_validation'],
             self._measured_delays['bitcoin']['block_validation'],
-            self._measured_delays['bitcoin']['time_between_blocks_seconds'])
+            self._measured_delays['bitcoin']['time_between_blocks_seconds'],
+            self._measured_delays['bitcoin']['block_verification'])
         self._env.delays = self._measured_delays['bitcoin']
 
     def _set_ethereum_delays(self):
         self._validate_distribution(
             self._measured_delays['ethereum']['tx_validation'],
             self._measured_delays['ethereum']['block_validation'],
-            self._measured_delays['ethereum']['time_between_blocks_seconds'])
+            self._measured_delays['ethereum']['time_between_blocks_seconds'],
+            self._measured_delays['ethereum']['block_verification']
+        )
         self._env.delays = self._measured_delays['ethereum']
 
     def _set_latencies(self):
