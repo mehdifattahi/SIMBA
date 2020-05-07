@@ -10,48 +10,7 @@ from blocksim.models.ethereum.message import Message
 from blocksim.MerkleTree import MerkleTree
 import time as times
 import math
-
-def verifyBlock(header, block_txs, verificationMode):
-    if verificationMode == "WithMerkle":
-        return verifyByMerkle(block_txs, header)
-    else:
-        return verifyWithoutMerkle(block_txs, header)
-
-
-def verifyTxInBlock(tx, route_count, blockNo):
-    i = 0
-    while i < route_count:
-        i += 1
-        if tx.hash == tx.hash:
-            tx.hash == tx.hash
-    return True
-
-
-def verifyByMerkle(block_txs, header):
-    tree = MerkleTree()
-    merkle_root = tree.calculateMerkleRoot(block_txs)
-    tx_block_no = 0
-    merkle_route_count = math.log(len(block_txs), 2)
-    for tx in block_txs:
-        verifyTxInBlock(tx, merkle_route_count, tx_block_no)
-        tx_block_no += 1
-    return True
-
-
-def calculateMerkleRoot(self, txs):
-    tx_hashes = []
-    for tx in txs:
-        tx_hashes.append(tx.hash)
-    return self.Get_Root_node()
-
-
-def verifyWithoutMerkle(block_txs, header):
-    for tx1 in block_txs:
-        for tx in block_txs:
-            if tx.hash == tx.hash:
-                tx.hash == tx.hash
-    return True
-
+from blocksim.utils import get_random_values
 
 class ETHNode(Node):
     def __init__(self,
@@ -313,24 +272,25 @@ class ETHNode(Node):
                     print(
                         f'Block size is: {block_txs}.')
                 else:
-                    if verifyBlock(header, block_txs, self.verification_mode):
-                        verification_time = times.time() - initial_time
+                    verification_time = self.verify_block(header, block_txs, self.verification_mode)
+                    blocks = {}
 
-                        blocks = {}
-                        # verification_time = self.bias(verification_time)
+                    if verification_time is not None:
+                        blocks.update({f'{block_hash[:8]}': verification_time})
+                        self.env.data['block_verification'].update(
+                            {f'{block_hash[:8]}': self.address + ": " + str(verification_time)})
 
-                        if verification_time is not None:
-                            blocks.update({f'{block_hash[:8]}': verification_time})
-                            self.env.data['block_verification'].update(
-                                {f'{block_hash[:8]}': self.address + ": " + str(verification_time)})
+                    new_block = Block(header, block_txs)
+                    if self.chain.add_block(new_block):
+                        del self.temp_headers[block_hash]
+                        print(
+                            f'{self.address} at {time(self.env)}: Block assembled and added to the tip of the chain  {new_block.header}')
 
-                        new_block = Block(header, block_txs)
-                        if self.chain.add_block(new_block):
-                            del self.temp_headers[block_hash]
-                            print(
-                                f'{self.address} at {time(self.env)}: Block assembled and added to the tip of the chain  {new_block.header}')
+    def verify_block(self, header, block_txs, verificationMode):
+        if verificationMode == "WithMerkle":
+            count = math.log(len(block_txs), 2)
+        else:
+            count = block_txs
+        delay = round(get_random_values(self.env.delays['block_verification'])[0], 4)
 
-    # def bias(self, verification_time):
-    #     if (self.verification_mode == "WithoutMerkle"):
-    #         verification_time = verification_time + verification_time * 11.96578428 / 3
-    #     return verification_time
+        return count * delay

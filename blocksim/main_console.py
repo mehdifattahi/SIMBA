@@ -24,6 +24,9 @@ def write_report(world, report_directory):
                 f.write(connection + ', ' + str(len(propagation_values)) + ', ' + str(sum) + ', ' + str(avg) + '\n')
         # f.write(dump_json(world.env.data['block_propagation']))
 
+    with open(report_directory + 'verification-time.csv', 'w') as f:
+        f.write(dump_json(world.env.data['block_verification']))
+
     vf_node = {}
     with open(report_directory + '_block-verification-time.csv', 'w') as f:
         # f.write(str(world.report_verification_time()))

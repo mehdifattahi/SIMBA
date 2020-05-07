@@ -95,14 +95,17 @@ class SimulationWorld:
         self._validate_distribution(
             self._measured_delays['bitcoin']['tx_validation'],
             self._measured_delays['bitcoin']['block_validation'],
-            self._measured_delays['bitcoin']['time_between_blocks_seconds'])
+            self._measured_delays['bitcoin']['time_between_blocks_seconds'],
+            self._measured_delays['bitcoin']['block_verification'])
         self._env.delays = self._measured_delays['bitcoin']
 
     def _set_ethereum_delays(self):
         self._validate_distribution(
             self._measured_delays['ethereum']['tx_validation'],
             self._measured_delays['ethereum']['block_validation'],
-            self._measured_delays['ethereum']['time_between_blocks_seconds'])
+            self._measured_delays['ethereum']['time_between_blocks_seconds'],
+            self._measured_delays['ethereum']['block_verification']
+        )
         self._env.delays = self._measured_delays['ethereum']
 
     def _set_latencies(self):
