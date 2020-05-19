@@ -281,10 +281,10 @@ class ETHNode(Node):
                         blocks.update({f'{block_hash[:8]}': verification_time})
                         # TODO: remove putting data in the memory
                         self.env.data['block_verification'].update(
-                            {f'{block_hash}' + "_" + self.address: str(verification_time)})
+                            {f'{block_hash[:8]}' + "_" + self.address: str(verification_time)})
 
                     db = DBConnection()
-                    db.inserBlock_verification({f'{block_hash}' + "_" + self.address: str(verification_time)})
+                    db.inserBlock_verification({f'{block_hash[:8]}' + "_" + self.address: str(verification_time)})
 
                     new_block = Block(header, block_txs)
                     if self.chain.add_block(new_block):
