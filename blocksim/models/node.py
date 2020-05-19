@@ -1,4 +1,6 @@
 from collections import namedtuple
+
+from blocksim.DBConnection import DBConnection
 from blocksim.models.network import Connection, Network
 from blocksim.models.chain import Chain
 from blocksim.models.consensus import Consensus
@@ -25,6 +27,8 @@ class Node:
 
     In order to a node to be identified in the network simulation, is needed to have an `address`
     """
+    global db
+
 
     def __init__(self,
                  env,
@@ -47,6 +51,7 @@ class Node:
         key = f'forks_{address}'
         self.env.data[key] = 0
         self.verification_mode = 'WithMerkle'
+        self.db = DBConnection()
 
     def connect(self, nodes: list):
         """Simulate an acknowledgement phase with given nodes. During simulation the nodes
@@ -59,6 +64,13 @@ class Node:
                 # Set the bases to monitor the block & TX propagation
                 self.env.data['block_propagation'].update({
                     f'{self.address}_{node.address}': {}})
+
+                # insert array as propagation list
+                # self.db.inserBlock_propagation(f'{self.address}_{node.address}', [])
+
+                # insert dict as propagation list
+                self.db.inserBlock_propagation(f'{self.address}_{node.address}', {})
+
                 # self.env.data['block_verification'].update({
                 #     f'{self.address}_{node.address}': {}})
                 self.env.data['tx_propagation'].update({
@@ -136,17 +148,30 @@ class Node:
                 self.env.data['tx_propagation'][f'{envelope.origin.address}_{envelope.destination.address}'].update(
                     txs)
             # Monitor the block propagation on Ethereum
+
             if envelope.msg['id'] == 'block_bodies':
                 block_propagation = self.env.data['block_propagation'][
                     f'{envelope.origin.address}_{envelope.destination.address}']
+
+                block_propagation_db = self.db.getBlockPropagation(f'{envelope.origin.address}_{envelope.destination.address}')
                 blocks = {}
                 for block_hash, _ in envelope.msg['block_bodies'].items():
                     initial_time = block_propagation.get(block_hash[:8], None)
                     if initial_time is not None:
                         propagation_time = self.env.now - initial_time
                         blocks.update({f'{block_hash[:8]}': propagation_time})
+
+                block_propagation_db.update(blocks)
                 self.env.data['block_propagation'][f'{envelope.origin.address}_{envelope.destination.address}'].update(
                     blocks)
+
+                blocksList = []
+                for key in blocks:
+                    blocksList.append(f'{key}: {blocks[key]}')
+                    print(key, '->', blocks[key])
+
+                # self.db.updateBlock_propagationList(f'{envelope.origin.address}_{envelope.destination.address}', blocksList)
+                self.db.updateBlock_propagationDict(f'{envelope.origin.address}_{envelope.destination.address}', block_propagation_db)
 
             self._read_envelope(envelope)
 
