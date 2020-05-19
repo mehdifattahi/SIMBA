@@ -11,6 +11,8 @@ from blocksim.MerkleTree import MerkleTree
 import time as times
 import math
 from blocksim.utils import get_random_values
+from blocksim.DBConnection import DBConnection
+
 
 class ETHNode(Node):
     def __init__(self,
@@ -277,8 +279,12 @@ class ETHNode(Node):
 
                     if verification_time is not None:
                         blocks.update({f'{block_hash[:8]}': verification_time})
+                        # TODO: remove putting data in the memory
                         self.env.data['block_verification'].update(
-                            {f'{block_hash[:8]}': self.address + ": " + str(verification_time)})
+                            {f'{block_hash}' + "_" + self.address: str(verification_time)})
+
+                    db = DBConnection()
+                    db.inserBlock_verification({f'{block_hash}' + "_" + self.address: str(verification_time)})
 
                     new_block = Block(header, block_txs)
                     if self.chain.add_block(new_block):

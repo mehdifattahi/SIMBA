@@ -5,6 +5,8 @@ from blocksim.world import SimulationWorld
 from blocksim.node_factory import NodeFactory
 from blocksim.transaction_factory import TransactionFactory
 from blocksim.models.network import Network
+from blocksim.DBConnection import DBConnection
+
 
 def write_report(world):
     report_directory = 'report/'
@@ -21,9 +23,15 @@ def write_report(world):
                 avg = sum / len(propagation_values)
                 f.write(connection + ', ' + str(len(propagation_values)) + ', ' + str(sum) + ', ' + str(avg) + '\n')
         # f.write(dump_json(world.env.data['block_propagation']))
-
+    # TODO: remove putting data in the memory
     with open(report_directory + 'verification-time.csv', 'w') as f:
         f.write(dump_json(world.env.data['block_verification']))
+    db = DBConnection()
+    verification = db.getAllBlock_verification()
+    with open(report_directory + 'verification-time-db.csv', 'w') as f:
+        for ver in verification:
+            f.write(str(ver))
+
 
     vf_node = {}
     with open(report_directory + 'block-verification-time.csv', 'w') as f:
